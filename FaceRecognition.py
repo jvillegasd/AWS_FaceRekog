@@ -14,14 +14,15 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 """
 
 AWS_REKOG = boto3.client('rekognition')
-AWS_S3_CONN = boto3.resource('s3')
-S3_BUCKET = 'awsrecok'
+S3_CONN = boto3.resource('s3')
+S3_BUCKET_NAME = 'awsrecok'
 IMAGE_NAME = 'prueba.jpg'
 COLLECTION_NAME = 'networking'
 
 
 def get_image():
-    aws_s3_object = AWS_S3_CONN.Object(S3_BUCKET, 'Testcases/' + IMAGE_NAME)
+    aws_s3_object = S3_CONN.Object(
+        S3_BUCKET_NAME, 'Testcases/' + IMAGE_NAME)
     response = aws_s3_object.get()
     bytes_array = io.BytesIO(response['Body'].read())
     return Image.open(bytes_array)
@@ -30,7 +31,7 @@ def get_image():
 def get_bounding_boxes():
     request = {
         'S3Object': {
-            'Bucket': S3_BUCKET,
+            'Bucket': S3_BUCKET_NAME,
             'Name': 'Testcases/' + IMAGE_NAME
         }
     }
@@ -66,7 +67,8 @@ def get_face_name(face, image):
     return ''
 
 
-def faces_recognition(image):
+def face_recognition(image):
+    print('Starting to recognize faces...')
     bounding_boxes = get_bounding_boxes()
     img_width, img_height = image.size
     faces_name = []
@@ -85,8 +87,11 @@ def faces_recognition(image):
                                                      top + height), (left, top + height), (left, top))
         draw.line(points, fill='#00d400', width=2)
         draw.text((top + height, left + width//2), faces_name[i], font=font)
+        print('A face has been recognized. Name: ' + faces_name[i])
     image.save("output.png")
+    print('Faces recognition has finished')
+
 
 if __name__ == '__main__':
     image = get_image()
-    faces_recognition(image)
+    face_recognition(image)
