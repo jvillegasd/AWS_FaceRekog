@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
-IMAGE_NAME = 'prueba2.jpg'
+IMAGE_NAME = 'prueba3.jpg'
 COLLECTION_NAME = 'networking'
 
 
