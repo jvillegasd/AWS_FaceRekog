@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
-IMAGE_NAME = 'prueba.jpg'
+IMAGE_NAME = 'prueba2.jpg'
 COLLECTION_NAME = 'networking'
 
 
@@ -63,7 +63,10 @@ def get_face_name(face, image):
     if face_exists(request):
         response = AWS_REKOG.search_faces_by_image(
             CollectionId=COLLECTION_NAME, Image=request, FaceMatchThreshold=70)
-        return response['FaceMatches'][0]['Face']['ExternalImageId']
+        if response['FaceMatches']:
+            return response['FaceMatches'][0]['Face']['ExternalImageId']
+        else:
+            return 'Not recognized'
     return ''
 
 
@@ -86,7 +89,7 @@ def face_recognition(image):
         points = ((left, top), (left + width, top), (left + width,
                                                      top + height), (left, top + height), (left, top))
         draw.line(points, fill='#00d400', width=2)
-        draw.text((top + height, left + width//2), faces_name[i], font=font)
+        draw.text((left, top), faces_name[i], font=font)
         print('A face has been recognized. Name: ' + faces_name[i])
     image.save("output.png")
     print('Faces recognition has finished')
