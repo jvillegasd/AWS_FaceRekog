@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
-IMAGE_NAME = 'prueba3.jpg'
+IMAGE_NAME = 'prueba7.jpg'
 COLLECTION_NAME = 'networking'
 
 
@@ -78,7 +78,7 @@ def face_recognition(image):
     for face in bounding_boxes:
         faces_name.append(get_face_name(face, image))
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("Hack-Bold.ttf", 36)
+    font = ImageFont.truetype("Hack-Bold.ttf", 40)
     for i in range(len(bounding_boxes)):
         if not faces_name[i]:
             continue
@@ -88,7 +88,7 @@ def face_recognition(image):
         top = img_height * bounding_boxes[i]['Top']
         points = ((left, top), (left + width, top), (left + width,
                                                      top + height), (left, top + height), (left, top))
-        draw.line(points, fill='#00d400', width=2)
+        draw.line(points, fill='#00d400', width=4)
         draw.text((left, top), faces_name[i], font=font)
         print('A face has been recognized. Name: ' + faces_name[i])
     image.save("output.png")

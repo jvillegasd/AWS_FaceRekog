@@ -2,7 +2,7 @@ import boto3
 from pprint import pprint
 
 """
-    This Pthon script connects to a folder located on an AWS S3 Bucket.
+    This Python script connects to a folder located on an AWS S3 Bucket.
     Retrieve all faces that will be added in the Current Collection in order to
     make AWS Face Rekognition works with a CS Course students faces
 """
