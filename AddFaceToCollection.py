@@ -8,7 +8,7 @@ from pprint import pprint
 """
 
 
-S3_REKOG = boto3.client('rekognition')
+AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.client('s3')
 S3_BUCKET_NAME = 'awsrecok'
 COLLECTION_NAME = 'networking'
@@ -35,7 +35,7 @@ def add_face(image_route):
         }
     }
     image_name = image_route.replace("FaceRecog/", "")
-    response = S3_REKOG.index_faces(CollectionId=COLLECTION_NAME, Image=request,
+    response = AWS_REKOG.index_faces(CollectionId=COLLECTION_NAME, Image=request,
                                     ExternalImageId=image_name, QualityFilter='AUTO', DetectionAttributes=['ALL'])
     face_record = response['FaceRecords']
     print('Result for: ' + image_name)
