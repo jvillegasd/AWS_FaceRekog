@@ -70,7 +70,7 @@ def init_collection_from_twitter():
     auth = tweepy.AppAuthHandler(
         credentials.CONSUMER_API_KEY, credentials.CONSUMER_API_SECRET_KEY)
     api = tweepy.API(auth)
-    for tweet in tweepy.Cursor(api.search, q=TWITTER_HASHTAG, include_entities=True).items(1):
+    for tweet in tweepy.Cursor(api.search, q=TWITTER_HASHTAG, include_entities=True).items():
         image_name = tweet.text.replace(TWITTER_HASHTAG, '')
         if 'media' in tweet.entities:
             image_url = tweet.entities['media'][0]['media_url']
