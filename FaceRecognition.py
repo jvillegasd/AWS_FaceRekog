@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 """
     This Python script gets an image from AWS S3 Bucket and use it for face recogniction.
     After a face is detected, it tries to recognize who is they comparing it with a
-    AWS Face Rekognition Collection from a CS course. 
-    AWS Face Rekognition JSON response returns a boundary box where the faces lie and their
+    Amazon Rekognition's Collection. 
+    Amazon Rekognition's JSON response returns a boundary box where the faces lie and their
     coordinates are expressed as the ratio of the image. Coordinates formulas:
         xCoordinate = xInPixels/imageWidth
         yCoordinate = yInPixels/imageHeight
@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
-IMAGE_NAME = 'prueba7.jpg'
+IMAGE_NAME = 'prueba8.jpg'
 COLLECTION_NAME = 'networking'
 
 

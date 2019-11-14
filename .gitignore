@@ -2,3 +2,5 @@ lib
 bin
 share
 output.png
+credentials.py
+__pycache__
