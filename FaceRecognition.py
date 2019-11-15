@@ -14,11 +14,16 @@ from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
     coordinates are expressed as the ratio of the image. Coordinates formulas:
         xCoordinate = xInPixels/imageWidth
         yCoordinate = yInPixels/imageHeight
+    
+    There are two methods to get photos for face recognitions (testcases):
+    -) Using Amazon S3: face_recog_with_s3()
+    -) Using Twitter API: face_recog_with_twitter()
 """
 
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
+S3_TESTCASES_FOLDER = 'Testcases/'
 IMAGE_NAME = 'prueba8.jpg'
 COLLECTION_NAME = 'networking'
 TWITTER_FACE_RECOG_HASHTAG = 'face_networking2019UN'
@@ -26,7 +31,7 @@ TWITTER_FACE_RECOG_HASHTAG = 'face_networking2019UN'
 
 def get_image_from_s3():
     aws_s3_object = S3_CONN.Object(
-        S3_BUCKET_NAME, 'Testcases/' + IMAGE_NAME)
+        S3_BUCKET_NAME, S3_TESTCASES_FOLDER + IMAGE_NAME)
     response = aws_s3_object.get()
     bytes_array = io.BytesIO(response['Body'].read())
     return Image.open(bytes_array)
@@ -69,11 +74,11 @@ def get_face_name(face, image):
 
 
 def face_recognition_saving_image(image):
-    print('Starting to recognize faces from Amazon S3 Bucket {}'.format(S3_BUCKET_NAME))
+    print('Starting to recognize faces from Amazon S3 Bucket: {}'.format(S3_BUCKET_NAME))
     request = {
         'S3Object': {
             'Bucket': S3_BUCKET_NAME,
-            'Name': 'Testcases/' + IMAGE_NAME
+            'Name': S3_TESTCASES_FOLDER + IMAGE_NAME
         }
     }
     bounding_boxes = get_bounding_boxes(request)
@@ -82,7 +87,7 @@ def face_recognition_saving_image(image):
     for face in bounding_boxes:
         faces_name.append(get_face_name(face, image))
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("Hack-Bold.ttf", 40)
+    font = ImageFont.truetype("Hack-Bold.ttf", 37)
     for i in range(len(bounding_boxes)):
         if not faces_name[i]:
             continue
@@ -131,8 +136,9 @@ def face_recog_with_twitter():
             response = requests.get(image_url)
             bytes_array = io.BytesIO(response.content)
             image = Image.open(bytes_array)
-            tweet_user = tweet.user.screen_name 
-            tweet_reply = face_recognition_retweet(image, bytes_array, tweet_user)
+            tweet_user = tweet.user.screen_name
+            tweet_reply = face_recognition_retweet(
+                image, bytes_array, tweet_user)
             try:
                 api.update_status(tweet_reply[:-1], tweet.id)
                 print('Replied tweet.')

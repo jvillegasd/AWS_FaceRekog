@@ -29,6 +29,7 @@ from pprint import pprint
 AWS_REKOG = boto3.client('rekognition')
 S3_CONN = boto3.client('s3')
 S3_BUCKET_NAME = 'awsrecok'
+S3_FACE_FOLDER = 'FaceRecog/'
 COLLECTION_NAME = 'networking'
 TWITTER_ADD_FACE_HASHTAG = '#networking2019UN'
 
@@ -36,7 +37,7 @@ TWITTER_ADD_FACE_HASHTAG = '#networking2019UN'
 def init_collection_from_s3():
     print('Fetching images from Amazon S3')
     response = S3_CONN.list_objects_v2(
-        Bucket=S3_BUCKET_NAME, Prefix='FaceRecog/', Delimiter='/')
+        Bucket=S3_BUCKET_NAME, Prefix=S3_FACE_FOLDER, Delimiter='/')
     images_object = response['Contents']
     for image_object in images_object:
         if image_object['Size'] == 0:
@@ -52,7 +53,7 @@ def add_face_from_s3(image_route):
             'Name': image_route
         }
     }
-    image_name = image_route.replace("FaceRecog/", "")
+    image_name = image_route.replace(S3_FACE_FOLDER, "")
     response = AWS_REKOG.index_faces(CollectionId=COLLECTION_NAME, Image=request,
                                      ExternalImageId=image_name, QualityFilter='AUTO', DetectionAttributes=['ALL'])
     face_record = response['FaceRecords']
@@ -66,7 +67,8 @@ def add_face_from_s3(image_route):
 
 def init_collection_from_twitter():
     print('|===========================================================================================================|')
-    print('Fetching images from Twitter hashtag: {}'.format(TWITTER_ADD_FACE_HASHTAG))
+    print('Fetching images from Twitter hashtag: {}'.format(
+        TWITTER_ADD_FACE_HASHTAG))
     auth = tweepy.AppAuthHandler(
         credentials.CONSUMER_API_KEY, credentials.CONSUMER_API_SECRET_KEY)
     api = tweepy.API(auth)
