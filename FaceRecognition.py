@@ -1,5 +1,8 @@
 import boto3
 import io
+import tweepy
+import credentials
+import requests
 from pprint import pprint
 from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 
@@ -18,9 +21,10 @@ S3_CONN = boto3.resource('s3')
 S3_BUCKET_NAME = 'awsrecok'
 IMAGE_NAME = 'prueba8.jpg'
 COLLECTION_NAME = 'networking'
+TWITTER_FACE_RECOG_HASHTAG = 'face_networking2019UN'
 
 
-def get_image():
+def get_image_from_s3():
     aws_s3_object = S3_CONN.Object(
         S3_BUCKET_NAME, 'Testcases/' + IMAGE_NAME)
     response = aws_s3_object.get()
@@ -28,13 +32,7 @@ def get_image():
     return Image.open(bytes_array)
 
 
-def get_bounding_boxes():
-    request = {
-        'S3Object': {
-            'Bucket': S3_BUCKET_NAME,
-            'Name': 'Testcases/' + IMAGE_NAME
-        }
-    }
+def get_bounding_boxes(request):
     response = AWS_REKOG.detect_faces(Image=request, Attributes=['ALL'])
     bounding_boxes = []
     for details in response['FaceDetails']:
@@ -70,9 +68,15 @@ def get_face_name(face, image):
     return ''
 
 
-def face_recognition(image):
-    print('Starting to recognize faces...')
-    bounding_boxes = get_bounding_boxes()
+def face_recognition_saving_image(image):
+    print('Starting to recognize faces from Amazon S3 Bucket {}'.format(S3_BUCKET_NAME))
+    request = {
+        'S3Object': {
+            'Bucket': S3_BUCKET_NAME,
+            'Name': 'Testcases/' + IMAGE_NAME
+        }
+    }
+    bounding_boxes = get_bounding_boxes(request)
     img_width, img_height = image.size
     faces_name = []
     for face in bounding_boxes:
@@ -92,9 +96,52 @@ def face_recognition(image):
         draw.text((left, top), faces_name[i], font=font)
         print('A face has been recognized. Name: ' + faces_name[i])
     image.save("output.png")
-    print('Faces recognition has finished')
+    print('Faces recognition has finished.')
+
+
+def face_recog_with_s3():
+    image = get_image_from_s3()
+    face_recognition_saving_image(image)
+
+
+def face_recognition_retweet(image, bytes_array):
+    twitter_reply = '@username Recognized faces: '
+    request = {
+        'Bytes': bytes_array.getvalue()
+    }
+    bounding_boxes = get_bounding_boxes(request)
+    img_width, img_height = image.size
+    for face in bounding_boxes:
+        name = get_face_name(face, image)
+        if name:
+            twitter_reply += name + ","
+    return twitter_reply
+
+
+def face_recog_with_twitter():
+    print('Starting to recognize faces from Twitter hashtag: {}'.format(
+        TWITTER_FACE_RECOG_HASHTAG))
+    auth = tweepy.OAuthHandler(
+        credentials.CONSUMER_API_KEY, credentials.CONSUMER_API_SECRET_KEY)
+    auth.set_access_token(credentials.ACCESS_TOKEN,
+                          credentials.ACCESS_TOKEN_SECRET)
+    api = tweepy.API(auth)
+    for tweet in tweepy.Cursor(api.search, q=TWITTER_FACE_RECOG_HASHTAG, include_entities=True).items():
+        image_name = tweet.text.replace(TWITTER_FACE_RECOG_HASHTAG, '')
+        if 'media' in tweet.entities:
+            image_url = tweet.entities['media'][0]['media_url']
+            tweet_url = tweet.entities['media'][0]['url']
+            response = requests.get(image_url)
+            bytes_array = io.BytesIO(response.content)
+            image = Image.open(bytes_array)
+            twitter_reply = face_recognition_retweet(image, bytes_array)
+            try:
+                api.update_status(twitter_reply[:-1], tweet.id)
+                print('Replied tweet.')
+            except tweepy.error.TweepError:
+                print('This tweet has already been replied.')
+    print('Faces recognition has finished.')
 
 
 if __name__ == '__main__':
-    image = get_image()
-    face_recognition(image)
+    face_recog_with_twitter()
