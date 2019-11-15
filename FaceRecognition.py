@@ -110,7 +110,6 @@ def face_recognition_retweet(image, bytes_array, tweet_user):
         'Bytes': bytes_array.getvalue()
     }
     bounding_boxes = get_bounding_boxes(request)
-    img_width, img_height = image.size
     for face in bounding_boxes:
         name = get_face_name(face, image)
         if name:
