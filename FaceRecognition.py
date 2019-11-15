@@ -104,8 +104,8 @@ def face_recog_with_s3():
     face_recognition_saving_image(image)
 
 
-def face_recognition_retweet(image, bytes_array):
-    twitter_reply = '@username Recognized faces: '
+def face_recognition_retweet(image, bytes_array, tweet_user):
+    twitter_reply = '@{} Recognized faces: '.format(tweet_user)
     request = {
         'Bytes': bytes_array.getvalue()
     }
@@ -133,7 +133,8 @@ def face_recog_with_twitter():
             response = requests.get(image_url)
             bytes_array = io.BytesIO(response.content)
             image = Image.open(bytes_array)
-            twitter_reply = face_recognition_retweet(image, bytes_array)
+            tweet_user = tweet.user.screen_name 
+            twitter_reply = face_recognition_retweet(image, bytes_array, tweet_user)
             try:
                 api.update_status(twitter_reply[:-1], tweet.id)
                 print('Replied tweet.')
