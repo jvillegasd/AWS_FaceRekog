@@ -126,16 +126,15 @@ def face_recog_with_twitter():
                           credentials.ACCESS_TOKEN_SECRET)
     api = tweepy.API(auth)
     for tweet in tweepy.Cursor(api.search, q=TWITTER_FACE_RECOG_HASHTAG, include_entities=True).items():
-        image_name = tweet.text.replace(TWITTER_FACE_RECOG_HASHTAG, '')
         if 'media' in tweet.entities:
             image_url = tweet.entities['media'][0]['media_url']
             response = requests.get(image_url)
             bytes_array = io.BytesIO(response.content)
             image = Image.open(bytes_array)
             tweet_user = tweet.user.screen_name 
-            twitter_reply = face_recognition_retweet(image, bytes_array, tweet_user)
+            tweet_reply = face_recognition_retweet(image, bytes_array, tweet_user)
             try:
-                api.update_status(twitter_reply[:-1], tweet.id)
+                api.update_status(tweet_reply[:-1], tweet.id)
                 print('Replied tweet.')
             except tweepy.error.TweepError:
                 print('This tweet has already been replied.')
