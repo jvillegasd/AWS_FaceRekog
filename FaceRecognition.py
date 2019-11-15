@@ -130,7 +130,6 @@ def face_recog_with_twitter():
         image_name = tweet.text.replace(TWITTER_FACE_RECOG_HASHTAG, '')
         if 'media' in tweet.entities:
             image_url = tweet.entities['media'][0]['media_url']
-            tweet_url = tweet.entities['media'][0]['url']
             response = requests.get(image_url)
             bytes_array = io.BytesIO(response.content)
             image = Image.open(bytes_array)
