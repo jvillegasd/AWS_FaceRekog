@@ -15,11 +15,12 @@ from pprint import pprint
     Tweet Schema: {
         hashtag
         name
+        --Image to be saved on Collection
     }
     Example:
             #hashtagThatIWant
             Sara
-            --Image to be saved on Collection
+            sara.png
     Example:
             #hashtagThatIWant
             Scarlett_Johanson
