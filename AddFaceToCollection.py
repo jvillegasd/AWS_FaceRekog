@@ -19,10 +19,11 @@ from pprint import pprint
     Example:
             #hashtagThatIWant
             Sara
+            --Image to be saved on Collection
     Example:
             #hashtagThatIWant
             Scarlett_Johanson
-
+            scarlet.jpg
 """
 
 
