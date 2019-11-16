@@ -7,7 +7,7 @@ from pprint import pprint
 from PIL import Image, ImageDraw, ExifTags, ImageColor, ImageFont
 
 """
-    This Python script gets an image from AWS S3 Bucket and use it for face recogniction.
+    This Python script gets an image from AWS S3 Bucket or a Twitter hashtag and use it for face recogniction.
     After a face is detected, it tries to recognize who is they comparing it with a
     Amazon Rekognition's Collection. 
     Amazon Rekognition's JSON response returns a boundary box where the faces lie and their
